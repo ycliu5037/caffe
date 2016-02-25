@@ -69,6 +69,7 @@ if __name__ == '__main__':
         sys.exit(0)
 
     # Download and verify model.
+    print frontmatter['caffemodel_url'], model_filename, reporthook
     urllib.urlretrieve(
         frontmatter['caffemodel_url'], model_filename, reporthook)
     if not model_checks_out():
