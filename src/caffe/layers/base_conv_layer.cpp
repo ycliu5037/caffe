@@ -7,6 +7,9 @@
 #include "caffe/util/math_functions.hpp"
 
 namespace caffe {
+  
+template <typename Dtype>
+Blob<Dtype> BaseConvolutionLayer<Dtype>::col_buffer_;
 
 template <typename Dtype>
 void BaseConvolutionLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
@@ -257,6 +260,7 @@ template <typename Dtype>
 void BaseConvolutionLayer<Dtype>::forward_cpu_gemm(const Dtype* input,
     const Dtype* weights, Dtype* output, bool skip_im2col) {
   const Dtype* col_buff = input;
+  this->col_buffer_.Reshape(this->col_buffer_shape_);
   if (!is_1x1_) {
     if (!skip_im2col) {
       conv_im2col_cpu(input, col_buffer_.mutable_cpu_data());
@@ -282,6 +286,7 @@ void BaseConvolutionLayer<Dtype>::forward_cpu_bias(Dtype* output,
 template <typename Dtype>
 void BaseConvolutionLayer<Dtype>::backward_cpu_gemm(const Dtype* output,
     const Dtype* weights, Dtype* input) {
+  this->col_buffer_.Reshape(this->col_buffer_shape_);
   Dtype* col_buff = col_buffer_.mutable_cpu_data();
   if (is_1x1_) {
     col_buff = input;
@@ -301,6 +306,7 @@ template <typename Dtype>
 void BaseConvolutionLayer<Dtype>::weight_cpu_gemm(const Dtype* input,
     const Dtype* output, Dtype* weights) {
   const Dtype* col_buff = input;
+  this->col_buffer_.Reshape(this->col_buffer_shape_);
   if (!is_1x1_) {
     conv_im2col_cpu(input, col_buffer_.mutable_cpu_data());
     col_buff = col_buffer_.cpu_data();
@@ -326,6 +332,7 @@ template <typename Dtype>
 void BaseConvolutionLayer<Dtype>::forward_gpu_gemm(const Dtype* input,
     const Dtype* weights, Dtype* output, bool skip_im2col) {
   const Dtype* col_buff = input;
+  this->col_buffer_.Reshape(this->col_buffer_shape_);
   if (!is_1x1_) {
     if (!skip_im2col) {
       conv_im2col_gpu(input, col_buffer_.mutable_gpu_data());
@@ -351,6 +358,7 @@ void BaseConvolutionLayer<Dtype>::forward_gpu_bias(Dtype* output,
 template <typename Dtype>
 void BaseConvolutionLayer<Dtype>::backward_gpu_gemm(const Dtype* output,
     const Dtype* weights, Dtype* input) {
+  this->col_buffer_.Reshape(this->col_buffer_shape_);
   Dtype* col_buff = col_buffer_.mutable_gpu_data();
   if (is_1x1_) {
     col_buff = input;
@@ -369,6 +377,7 @@ void BaseConvolutionLayer<Dtype>::backward_gpu_gemm(const Dtype* output,
 template <typename Dtype>
 void BaseConvolutionLayer<Dtype>::weight_gpu_gemm(const Dtype* input,
     const Dtype* output, Dtype* weights) {
+  this->col_buffer_.Reshape(this->col_buffer_shape_);
   const Dtype* col_buff = input;
   if (!is_1x1_) {
     conv_im2col_gpu(input, col_buffer_.mutable_gpu_data());
