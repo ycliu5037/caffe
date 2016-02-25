@@ -50,11 +50,14 @@ def parse_log(path_to_log):
                 # Only start parsing for other stuff if we've found the first
                 # iteration
                 continue
-
-            time = extract_seconds.extract_datetime_from_line(line,
-                                                              logfile_year)
-            seconds = (time - start_time).total_seconds()
-
+            try:
+                time = extract_seconds.extract_datetime_from_line(line,
+                                                                  logfile_year)
+                seconds = (time - start_time).total_seconds()
+            except:
+                time=-1
+                seconds=-1
+            
             learning_rate_match = regex_learning_rate.search(line)
             if learning_rate_match:
                 learning_rate = float(learning_rate_match.group(1))
